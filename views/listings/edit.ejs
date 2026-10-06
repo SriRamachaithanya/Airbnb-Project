@@ -1,38 +1,127 @@
-<%  layout("/layouts/boilerplate")%>
-<div class="row mt-3">
-    <div class="col-8 offset-2">
-    
-    <h3>EDIT YOUR LISTING </h3>
-    <form method="POST" action="/listings/<%= listing._id %>?_method=PUT">
-        <div class="mb-3">
-            <lable for="title" class="form-label">Title</lable>
-            <input type="text" name="listing[title]" value="<%=listing.title  %>" class="form-control"><br/><br>
-        </div>
-        <div class="mb-3">
-            <lable for="description" class="form-label">Description</lable>
-            <input type="text" name="listing[description]" value="<%= listing.Description %>"class="form-control" ><br><br>
-        </div>
-        <div class="mb-3">
-            <lable for="price" class="form-label">Price</lable>
-            <input type="number" name="listing[price]" value="<%= listing.Price %>" class="form-control"><br><br>
+<% layout("/layouts/boilerplate") %>
 
-        </div>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-7">
+    <div class="form-card">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="badge bg-dark text-white rounded-pill px-3 py-1">Manage Property</span>
+      </div>
+      <h2 class="form-title">Edit your listing</h2>
+      <p class="form-subtitle">Update details, pricing, and photos for <%= listing.title %></p>
+
+      <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" class="needs-validation">
+        <!-- Title -->
         <div class="mb-3">
-            <lable for="location" class="form-label">Location</lable>
-            <input type="text" name="listing[location]" value="<%= listing.Location %>" class="form-control"><br><br>
+          <label for="title" class="form-label">Property Title</label>
+          <input 
+            type="text" 
+            id="title"
+            name="listing[title]" 
+            value="<%= listing.title %>" 
+            class="form-control"
+            required
+          >
         </div>
-        <div>
-            <lable for="country" class="form-label">Country</lable>
-            <input type="text" name="listing[country]" value="<%= listing.Country %>" class="form-control"><br><br>
-            </div>  
-         <div>
-            <lable for="listingimage" class="form-label">Image URL</lable>
-            <input type="text" name="listing[listingimage]" value="<%= listing.imageURL %>" class="form-control"><br><br>
-         </div>   
-        <br><br>
-        <button class="btn btn-dark edit-btn mt-3">EDIT</button>
-         </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea 
+            id="description"
+            name="listing[description]" 
+            class="form-control" 
+            rows="4"
+            required
+          ><%= listing.description %></textarea>
         </div>
+
+        <!-- Current Image Preview & Input -->
+        <div class="mb-3">
+          <label for="image" class="form-label">Cover Image URL</label>
+          <% if (listing.image && listing.image.url) { %>
+            <div class="mb-2" style="max-width: 200px; height: 120px; border-radius: 8px; overflow: hidden;">
+              <img src="<%= listing.image.url %>" alt="Current image preview" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+          <% } %>
+          <input 
+            type="url" 
+            id="image"
+            name="listing[image]" 
+            value="<%= (listing.image && listing.image.url) ? listing.image.url : '' %>" 
+            class="form-control"
+          >
+          <div class="form-text text-muted">Paste a new image URL to change the cover photo.</div>
+        </div>
+
+        <!-- Category & Price Row -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label for="category" class="form-label">Property Category</label>
+            <select id="category" name="listing[category]" class="form-select">
+              <option value="Trending" <%= listing.category === 'Trending' ? 'selected' : '' %>>Trending</option>
+              <option value="Beachfront" <%= listing.category === 'Beachfront' ? 'selected' : '' %>>Beachfront</option>
+              <option value="Cabins" <%= listing.category === 'Cabins' ? 'selected' : '' %>>Cabins</option>
+              <option value="Iconic Cities" <%= listing.category === 'Iconic Cities' ? 'selected' : '' %>>Iconic Cities</option>
+              <option value="Mountains" <%= listing.category === 'Mountains' ? 'selected' : '' %>>Mountains</option>
+              <option value="Castles" <%= listing.category === 'Castles' ? 'selected' : '' %>>Castles</option>
+              <option value="Amazing Pools" <%= listing.category === 'Amazing Pools' ? 'selected' : '' %>>Amazing Pools</option>
+              <option value="Camping" <%= listing.category === 'Camping' ? 'selected' : '' %>>Camping</option>
+              <option value="Farms" <%= listing.category === 'Farms' ? 'selected' : '' %>>Farms</option>
+              <option value="Arctic" <%= listing.category === 'Arctic' ? 'selected' : '' %>>Arctic</option>
+              <option value="Luxury" <%= listing.category === 'Luxury' ? 'selected' : '' %>>Luxury</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="price" class="form-label">Price per night (₹ INR)</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light fw-bold">&#8377;</span>
+              <input 
+                type="number" 
+                id="price"
+                name="listing[price]" 
+                value="<%= listing.price %>" 
+                class="form-control"
+                min="100"
+                required
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Location & Country Row -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="location" class="form-label">City / Location</label>
+            <input 
+              type="text" 
+              id="location"
+              name="listing[location]" 
+              value="<%= listing.location %>" 
+              class="form-control"
+              required
+            >
+          </div>
+
+          <div class="col-md-6">
+            <label for="country" class="form-label">Country</label>
+            <input 
+              type="text" 
+              id="country"
+              name="listing[country]" 
+              value="<%= listing.country %>" 
+              class="form-control"
+              required
+            >
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+          <a href="/listings/<%= listing._id %>" class="btn btn-airbnb-outline">Cancel</a>
+          <button type="submit" class="btn btn-airbnb px-4">Save Changes</button>
+        </div>
+      </form>
     </div>
-
-    </form>
+  </div>
+</div>

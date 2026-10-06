@@ -1,34 +1,123 @@
-<%  layout("/layouts/boilerplate")%>
-<div class="row">
-    <div class="col-8 offset-2">
-    <h3>CREATE A NEW LISTING </h3>
-    <form method="POST" action="/listings">
-        <div class="mb-3">
-        <lable for="title" class="form-label">Title</lable>
-        <input type="text" name="listing[title]" placeholder=" enter Title" class="form-control">
-       </div><br/>
-       <div class="mb-3">
-        <lable for="description" class="form-label">Description</lable>
-        <input type="text" name="listing[description]" placeholder=" enter Description" class="form-control">
-       </div>
-       <div class="mb-3">
-        <lable for="price" class="form-label">Price</lable>
-        <input type="number" name="listing[price]" placeholder=" enter Price" class="form-control">
-        </div>
->      <div class="mb-3">
-        <lable for="location" class="form-label">Location</lable>
-        <input type="text" name="listing[location]" placeholder=" enter Location" class="form-control">
-       </div><br>
-       <div class="mb-3">
-        <lable for="country" class="form-label">Country</lable>
-        <input type="text" name="listing[country]" placeholder=" enter Country" class="form-control">
-       </div><br>
-       <div class="mb-3">
-        <lable for="listingimage" class="form-label">Image URL</lable>
-        <input type="text" name="listing[listingimage]" placeholder=" enter Image URL" class="form-control">
-        </div><br><br> 
-        <button class="btn btn-dark add-btn">ADD</button>
+<% layout("/layouts/boilerplate") %>
 
-    </form>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-7">
+    <div class="form-card">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <span class="badge bg-danger text-white rounded-pill px-3 py-1">Hosting</span>
+      </div>
+      <h2 class="form-title">Create a new listing</h2>
+      <p class="form-subtitle">Share your home with travelers from around the world.</p>
+
+      <form method="POST" action="/listings" class="needs-validation">
+        <!-- Title -->
+        <div class="mb-3">
+          <label for="title" class="form-label">Property Title</label>
+          <input 
+            type="text" 
+            id="title"
+            name="listing[title]" 
+            placeholder="e.g. Luxurious Beachfront Villa with Private Pool" 
+            class="form-control"
+            required
+          >
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea 
+            id="description"
+            name="listing[description]" 
+            placeholder="Describe what makes your space special, the view, atmosphere, and amenities..." 
+            class="form-control" 
+            rows="4"
+            required
+          ></textarea>
+        </div>
+
+        <!-- Image URL -->
+        <div class="mb-3">
+          <label for="image" class="form-label">Cover Image URL</label>
+          <input 
+            type="url" 
+            id="image"
+            name="listing[image]" 
+            placeholder="https://images.unsplash.com/photo-..." 
+            class="form-control"
+          >
+          <div class="form-text text-muted">Provide a high-resolution Unsplash or direct image URL.</div>
+        </div>
+
+        <!-- Category & Price Row -->
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label for="category" class="form-label">Property Category</label>
+            <select id="category" name="listing[category]" class="form-select">
+              <option value="Trending">Trending</option>
+              <option value="Beachfront">Beachfront</option>
+              <option value="Cabins">Cabins</option>
+              <option value="Iconic Cities">Iconic Cities</option>
+              <option value="Mountains">Mountains</option>
+              <option value="Castles">Castles</option>
+              <option value="Amazing Pools">Amazing Pools</option>
+              <option value="Camping">Camping</option>
+              <option value="Farms">Farms</option>
+              <option value="Arctic">Arctic</option>
+              <option value="Luxury">Luxury</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label for="price" class="form-label">Price per night (₹ INR)</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light fw-bold">&#8377;</span>
+              <input 
+                type="number" 
+                id="price"
+                name="listing[price]" 
+                placeholder="1200" 
+                class="form-control"
+                min="100"
+                required
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Location & Country Row -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="location" class="form-label">City / Location</label>
+            <input 
+              type="text" 
+              id="location"
+              name="listing[location]" 
+              placeholder="e.g. Goa, Aspen, Malibu" 
+              class="form-control"
+              required
+            >
+          </div>
+
+          <div class="col-md-6">
+            <label for="country" class="form-label">Country</label>
+            <input 
+              type="text" 
+              id="country"
+              name="listing[country]" 
+              placeholder="e.g. India, United States" 
+              class="form-control"
+              required
+            >
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+          <a href="/listings" class="btn btn-airbnb-outline">Cancel</a>
+          <button type="submit" class="btn btn-airbnb px-4">Publish Listing</button>
+        </div>
+      </form>
     </div>
+  </div>
 </div>

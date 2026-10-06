@@ -1,24 +1,221 @@
-<%  layout("/layouts/boilerplate")%>
+<% layout("/layouts/boilerplate") %>
 
-    <h3>Listing Details:</h3>
+<div class="container show-container my-4" style="max-width: 1120px;">
+  <!-- Show Header -->
+  <div class="show-header">
+    <h1 class="show-title"><%= listing.title %></h1>
+    <div class="show-subnav">
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="fw-semibold">
+          <i class="fa-solid fa-star"></i> <%= listing.rating || '4.92' %>
+        </span>
+        <span>&middot;</span>
+        <span class="text-decoration-underline"><%= listing.reviewsCount || '48' %> reviews</span>
+        <span>&middot;</span>
+        <span class="badge bg-light text-dark border"><i class="fa-solid fa-medal text-danger"></i> Superhost</span>
+        <span>&middot;</span>
+        <span class="text-decoration-underline"><%= listing.location %>, <%= listing.country %></span>
+      </div>
 
-    <!-- <div class="card">
-        <img src="<%= listing.image %>" class="card-img-top" alt="listing_image"/>
-        <div class="card-body">
-            <p class="card-text"><%= listing.title %></p>
-    </div> -->
-    <ul>
-        <li><%= listing.title %></li>
-        <li><%= listing.description %></li>
-        <li> &#8377;<%= listing.price.toLocaleString("en-IN") %></li>
-        <li><%= listing.location %></li>
-        <li><%= listing.country %></li>
-    </ul>
-    <br>
-    
-    <a href="/listings/<%= listing._id.toString() %>/edit">Edit this Listing</a>
-     <br><br>
-    <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
-        <button>Delete this listing</button>
-    </form>
+      <div class="show-actions d-none d-md-flex">
+        <button class="action-pill-btn" onclick="navigator.clipboard?.writeText(window.location.href); alert('Link copied to clipboard!');">
+          <i class="fa-solid fa-arrow-up-from-bracket"></i> Share
+        </button>
+        <button class="action-pill-btn wishlist-btn-show">
+          <i class="fa-regular fa-heart"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
 
+  <!-- Airbnb 5-Photo Gallery Grid -->
+  <div class="gallery-grid">
+    <div class="main-photo">
+      <img 
+        src="<%= (listing.image && listing.image.url) ? listing.image.url : 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=800&q=60' %>" 
+        alt="<%= listing.title %> main view"
+      />
+    </div>
+    <div class="sub-photo">
+      <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=60" alt="Living room" />
+    </div>
+    <div class="sub-photo">
+      <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=60" alt="Bedroom" />
+    </div>
+    <div class="sub-photo">
+      <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=60" alt="Kitchen" />
+    </div>
+    <div class="sub-photo">
+      <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=60" alt="Balcony" />
+    </div>
+  </div>
+
+  <!-- Content & Reservation 2-Column Section -->
+  <div class="row g-5">
+    <!-- Left Column: Details & Amenities -->
+    <div class="col-12 col-lg-7">
+      <!-- Host Header -->
+      <div class="host-header-box">
+        <div>
+          <h4 class="fw-bold mb-1">Entire home in <%= listing.location %>, <%= listing.country %></h4>
+          <p class="text-secondary mb-0">6 guests &middot; 3 bedrooms &middot; 3 beds &middot; 2 baths</p>
+        </div>
+        <div class="host-avatar-lg">
+          <i class="fa-solid fa-user"></i>
+        </div>
+      </div>
+
+      <!-- Airbnb Highlights -->
+      <div class="pb-4 border-bottom mb-4">
+        <div class="feature-item">
+          <i class="fa-solid fa-door-open"></i>
+          <div>
+            <div class="feature-title">Self check-in</div>
+            <div class="feature-desc">Check yourself in with the high-tech smart lock.</div>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <i class="fa-solid fa-medal"></i>
+          <div>
+            <div class="feature-title">Alex is a Superhost</div>
+            <div class="feature-desc">Superhosts are experienced, highly rated hosts committed to great stays.</div>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <i class="fa-solid fa-location-dot"></i>
+          <div>
+            <div class="feature-title">Unbeatable location</div>
+            <div class="feature-desc">95% of recent guests gave the location a 5-star rating.</div>
+          </div>
+        </div>
+
+        <div class="feature-item mb-0">
+          <i class="fa-solid fa-calendar-check"></i>
+          <div>
+            <div class="feature-title">Free cancellation for 48 hours</div>
+            <div class="feature-desc">Get a full refund if you change your plans before check-in.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AirCover Badge -->
+      <div class="pb-4 border-bottom mb-4">
+        <h5 class="fw-bold text-danger mb-2"><span class="text-dark">air</span>cover</h5>
+        <p class="text-secondary mb-2" style="font-size: 0.9rem;">
+          Every booking includes free protection from Host cancellations, listing inaccuracies, and other issues like trouble checking in.
+        </p>
+        <a href="/terms" class="fw-bold text-dark text-decoration-underline" style="font-size: 0.875rem;">Learn more</a>
+      </div>
+
+      <!-- Description -->
+      <div class="pb-4 border-bottom mb-4">
+        <h5 class="fw-bold mb-3">About this space</h5>
+        <p style="line-height: 1.65; color: #333; font-size: 0.975rem;">
+          <%= listing.description %>
+        </p>
+      </div>
+
+      <!-- Amenities Section -->
+      <div class="pb-4 border-bottom mb-4">
+        <h5 class="fw-bold mb-3">What this place offers</h5>
+        <div class="amenities-grid">
+          <div class="amenity-item"><i class="fa-solid fa-water text-secondary"></i> Scenic views</div>
+          <div class="amenity-item"><i class="fa-solid fa-wifi text-secondary"></i> Fast wifi &middot; 500 Mbps</div>
+          <div class="amenity-item"><i class="fa-solid fa-laptop text-secondary"></i> Dedicated workspace</div>
+          <div class="amenity-item"><i class="fa-solid fa-car text-secondary"></i> Free parking on premises</div>
+          <div class="amenity-item"><i class="fa-solid fa-person-swimming text-secondary"></i> Private outdoor pool</div>
+          <div class="amenity-item"><i class="fa-solid fa-tv text-secondary"></i> 65" 4K HDTV</div>
+          <div class="amenity-item"><i class="fa-solid fa-snowflake text-secondary"></i> Central air conditioning</div>
+          <div class="amenity-item"><i class="fa-solid fa-kitchen-set text-secondary"></i> Fully equipped kitchen</div>
+        </div>
+      </div>
+
+      <!-- Host Manage Actions -->
+      <div class="pt-2 d-flex gap-3 align-items-center flex-wrap">
+        <a href="/listings/<%= listing._id %>/edit" class="btn btn-airbnb-outline">
+          <i class="fa-solid fa-pen-to-square me-1"></i> Edit Listing
+        </a>
+        <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="m-0" onsubmit="return confirm('Are you sure you want to permanently delete this listing?');">
+          <button class="btn btn-outline-danger">
+            <i class="fa-solid fa-trash me-1"></i> Delete Listing
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Column: Sticky Booking / Reservation Widget -->
+    <div class="col-12 col-lg-5">
+      <div class="booking-card">
+        <div class="booking-header">
+          <div>
+            <span class="booking-price">&#8377;<%= Number(listing.price).toLocaleString("en-IN") %></span>
+            <span class="text-secondary"> / night</span>
+          </div>
+          <div class="d-flex align-items-center gap-1 font-semibold" style="font-size: 0.9rem;">
+            <i class="fa-solid fa-star"></i>
+            <span><%= listing.rating || '4.92' %></span>
+            <span class="text-secondary">&middot; <%= listing.reviewsCount || '48' %> reviews</span>
+          </div>
+        </div>
+
+        <!-- Date & Guest Inputs -->
+        <div class="booking-inputs-box">
+          <div class="booking-dates-row">
+            <div class="booking-date-cell">
+              <label>Check-in</label>
+              <input type="date" value="2026-10-12">
+            </div>
+            <div class="booking-date-cell">
+              <label>Checkout</label>
+              <input type="date" value="2026-10-17">
+            </div>
+          </div>
+          <div class="booking-guests-cell">
+            <label>Guests</label>
+            <select>
+              <option>1 guest</option>
+              <option selected>2 guests</option>
+              <option>3 guests</option>
+              <option>4+ guests</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-reserve" onclick="alert('Reservation request received! This is a demo booking flow.');">
+          Reserve
+        </button>
+
+        <p class="text-center text-secondary mb-3" style="font-size: 0.85rem;">You won't be charged yet</p>
+
+        <!-- Price Breakdown -->
+        <div class="price-breakdown">
+          <% const nights = 5; %>
+          <% const baseTotal = listing.price * nights; %>
+          <% const cleaningFee = 500; %>
+          <% const serviceFee = Math.round(baseTotal * 0.14); %>
+          <% const grandTotal = baseTotal + cleaningFee + serviceFee; %>
+
+          <div class="price-breakdown-row">
+            <span class="text-decoration-underline">&#8377;<%= Number(listing.price).toLocaleString("en-IN") %> x <%= nights %> nights</span>
+            <span>&#8377;<%= Number(baseTotal).toLocaleString("en-IN") %></span>
+          </div>
+          <div class="price-breakdown-row">
+            <span class="text-decoration-underline">Cleaning fee</span>
+            <span>&#8377;<%= Number(cleaningFee).toLocaleString("en-IN") %></span>
+          </div>
+          <div class="price-breakdown-row">
+            <span class="text-decoration-underline">Wanderlust service fee</span>
+            <span>&#8377;<%= Number(serviceFee).toLocaleString("en-IN") %></span>
+          </div>
+
+          <div class="price-breakdown-total">
+            <span>Total before taxes</span>
+            <span>&#8377;<%= Number(grandTotal).toLocaleString("en-IN") %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

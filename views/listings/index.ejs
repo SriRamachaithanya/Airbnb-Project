@@ -1,27 +1,116 @@
-<%  layout("/layouts/boilerplate")%>
-<body>
-    <h3>ALL LISTINGS</h3>
-    <!-- <form method="GET" action="/listings/new">
-        <button>Create New Listing</button>
-    </form> -->
-    <div class="row row-cols-lg-3 row-sols-md-3 row-cols-sm-1">
-    <% for(let listing of allListings){%>
-      <a href="/listings/<%= listing._id %>" class="listing-link">  
-    <div class="card">
-        <img src="<%= listing.image.url %>" class="card-img-top" alt="listing image" style="height: 20rem;">
-        <div class="card-img-overlay"></div>
-        <div class="card-body">
-          <p class="card-text">
-           <b> <%= listing.title %><br/></b>
-            &#8377;<%= listing.price %>/night
-        </p>
-        </div>
-      </div>
-      <%}%>
-    </div>
+<% layout("/layouts/boilerplate") %>
+
+<!-- Airbnb Category Filter Carousel -->
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-2">
+  <div class="categories-container flex-grow-1">
+    <a href="/listings" class="category-item <%= (!activeCategory || activeCategory === 'All') ? 'active' : '' %>">
+      <i class="fa-solid fa-fire"></i>
+      <span>Trending</span>
     </a>
+    <a href="/listings?category=Beachfront" class="category-item <%= activeCategory === 'Beachfront' ? 'active' : '' %>">
+      <i class="fa-solid fa-umbrella-beach"></i>
+      <span>Beachfront</span>
+    </a>
+    <a href="/listings?category=Cabins" class="category-item <%= activeCategory === 'Cabins' ? 'active' : '' %>">
+      <i class="fa-solid fa-house-chimney-window"></i>
+      <span>Cabins</span>
+    </a>
+    <a href="/listings?category=Iconic Cities" class="category-item <%= activeCategory === 'Iconic Cities' ? 'active' : '' %>">
+      <i class="fa-solid fa-mountain-city"></i>
+      <span>Iconic Cities</span>
+    </a>
+    <a href="/listings?category=Mountains" class="category-item <%= activeCategory === 'Mountains' ? 'active' : '' %>">
+      <i class="fa-solid fa-mountain-sun"></i>
+      <span>Mountains</span>
+    </a>
+    <a href="/listings?category=Castles" class="category-item <%= activeCategory === 'Castles' ? 'active' : '' %>">
+      <i class="fa-brands fa-fort-awesome"></i>
+      <span>Castles</span>
+    </a>
+    <a href="/listings?category=Amazing Pools" class="category-item <%= activeCategory === 'Amazing Pools' ? 'active' : '' %>">
+      <i class="fa-solid fa-person-swimming"></i>
+      <span>Amazing Pools</span>
+    </a>
+    <a href="/listings?category=Camping" class="category-item <%= activeCategory === 'Camping' ? 'active' : '' %>">
+      <i class="fa-solid fa-campground"></i>
+      <span>Camping</span>
+    </a>
+    <a href="/listings?category=Farms" class="category-item <%= activeCategory === 'Farms' ? 'active' : '' %>">
+      <i class="fa-solid fa-cow"></i>
+      <span>Farms</span>
+    </a>
+    <a href="/listings?category=Arctic" class="category-item <%= activeCategory === 'Arctic' ? 'active' : '' %>">
+      <i class="fa-regular fa-snowflake"></i>
+      <span>Arctic</span>
+    </a>
+    <a href="/listings?category=Luxury" class="category-item <%= activeCategory === 'Luxury' ? 'active' : '' %>">
+      <i class="fa-solid fa-gem"></i>
+      <span>Luxury</span>
+    </a>
+  </div>
 
+  <!-- Display Taxes Toggle Switch -->
+  <div class="tax-toggle-box d-none d-lg-flex">
+    <div class="form-check form-switch p-0 m-0 d-flex align-items-center gap-2">
+      <label class="form-check-label" for="taxToggleSwitch">Display total before taxes</label>
+      <input class="form-check-input ms-2" type="checkbox" role="switch" id="taxToggleSwitch" style="cursor: pointer;">
+    </div>
+  </div>
+</div>
 
-    
+<!-- Listings Grid -->
+<div class="listings-grid">
+  <% if (allListings && allListings.length > 0) { %>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+      <% for (let listing of allListings) { %>
+        <div class="col">
+          <div class="listing-card">
+            <div class="img-wrapper">
+              <a href="/listings/<%= listing._id %>">
+                <img 
+                  src="<%= (listing.image && listing.image.url) ? listing.image.url : 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=800&q=60' %>" 
+                  alt="<%= listing.title %>"
+                  loading="lazy"
+                />
+              </a>
+              <!-- Wishlist Heart Button -->
+              <button class="wishlist-btn" title="Save to wishlist" aria-label="Save to wishlist">
+                <i class="fa-regular fa-heart"></i>
+              </button>
+            </div>
 
-</body>
+            <a href="/listings/<%= listing._id %>" class="text-decoration-none">
+              <div class="card-details">
+                <div class="card-header-row">
+                  <h6 class="listing-location-title">
+                    <%= listing.location %>, <%= listing.country %>
+                  </h6>
+                  <span class="listing-rating">
+                    <i class="fa-solid fa-star"></i>
+                    <span><%= listing.rating || '4.88' %></span>
+                  </span>
+                </div>
+                
+                <p class="listing-subtext"><%= listing.title %></p>
+                <p class="listing-subtext text-muted" style="font-size: 0.8rem;">Added recently</p>
+                
+                <div class="listing-pricing">
+                  <span class="price-bold">&#8377;<%= Number(listing.price).toLocaleString("en-IN") %></span>
+                  <span> night</span>
+                  <span class="tax-info fw-semibold text-muted"> &middot; incl. all taxes</span>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  <% } else { %>
+    <div class="text-center py-5 my-5">
+      <i class="fa-solid fa-magnifying-glass mb-3 text-muted" style="font-size: 3rem;"></i>
+      <h4 class="fw-bold">No exact matches found</h4>
+      <p class="text-muted">Try changing or clearing your search filter to see more listings.</p>
+      <a href="/listings" class="btn btn-airbnb mt-2">Clear all filters</a>
+    </div>
+  <% } %>
+</div>

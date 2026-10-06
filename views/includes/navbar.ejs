@@ -1,17 +1,58 @@
-<nav class="navbar navbar-expand-md bg-body-light border-bottom Sticky-top">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/"><i class="fa-regular fa-compass"></i></a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
-        <span class="navbar-toggler-icon"></span>
+<header class="airbnb-header">
+  <div class="container d-flex align-items-center justify-content-between">
+    <!-- Brand / Logo -->
+    <a class="navbar-brand" href="/listings">
+      <i class="fa-regular fa-compass"></i>
+      <span>wanderlust</span>
+    </a>
+
+    <!-- Center Search Bar Pill (Airbnb Style) -->
+    <form action="/listings" method="GET" class="d-none d-md-flex align-items-center mb-0">
+      <div class="airbnb-search-bar">
+        <input 
+          type="text" 
+          name="search" 
+          class="form-control border-0 bg-transparent p-0 shadow-none search-segment" 
+          placeholder="Anywhere" 
+          style="width: 110px; font-size: 0.875rem;"
+          value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+        />
+        <div class="search-divider"></div>
+        <span class="search-segment">Any week</span>
+        <div class="search-divider"></div>
+        <span class="search-segment text-muted">Add guests</span>
+        <button type="submit" class="search-btn" title="Search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
+    </form>
+
+    <!-- Right User Navigation Menu -->
+    <div class="airbnb-user-nav">
+      <a href="/listings/new" class="host-link-btn d-none d-sm-block">
+        Airbnb your home
+      </a>
+
+      <button class="globe-btn d-none d-sm-block" title="Language & Currency">
+        <i class="fa-solid fa-globe"></i>
       </button>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-link"  href="/">Home</a>
-          <a class="nav-link" href="/listings">All Listings</a>
-          <a class="nav-link" href="/listings/new">Add new Listing</a>
-          
+
+      <!-- Dropdown User Pill -->
+      <div class="dropdown">
+        <div class="user-profile-pill" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+          <i class="fa-solid fa-bars text-secondary" style="font-size: 0.9rem;"></i>
+          <div class="user-avatar-placeholder">
+            <i class="fa-solid fa-user"></i>
+          </div>
         </div>
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-2 py-2" style="min-width: 220px;">
+          <li><a class="dropdown-item fw-semibold py-2" href="/listings">Explore Listings</a></li>
+          <li><a class="dropdown-item fw-semibold py-2" href="/listings/new">Airbnb your home</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-secondary py-2" href="/terms">Help Center</a></li>
+          <li><a class="dropdown-item text-secondary py-2" href="/privacy">Privacy & Terms</a></li>
+        </ul>
       </div>
     </div>
-  </nav>
-  
+  </div>
+</header>
