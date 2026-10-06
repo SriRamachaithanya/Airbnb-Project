@@ -17,28 +17,38 @@ const MONGO_URL =
   process.env.DATABASE_URL ||
   "mongodb://127.0.0.1:27017/wanderlust1";
 
-// Database Connection with caching for Serverless / Vercel
-let isConnected = false;
-async function connectDB() {
-  if (isConnected || mongoose.connection.readyState === 1) {
-    isConnected = true;
-    return;
-  }
-  if (!process.env.MONGO_URL && !process.env.MONGODB_URI && !process.env.ATLASDB_URL && process.env.NODE_ENV === "production") {
-    console.error("CRITICAL: No MongoDB Atlas connection URI provided in Vercel Environment Variables!");
-  }
-  try {
-    await mongoose.connect(MONGO_URL, {
-      serverSelectionTimeoutMS: 5000,
-    });
-    isConnected = true;
-    console.log("Connected to MongoDB successfully");
-  } catch (err) {
-    console.error("MongoDB connection error:", err.message);
-  }
+// Global connection cache for Vercel Serverless
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
 }
 
-connectDB();
+async function connectDB() {
+  if (cached.conn && mongoose.connection.readyState === 1) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const opts = {
+      serverSelectionTimeoutMS: 8000,
+    };
+
+    cached.promise = mongoose.connect(MONGO_URL, opts).then((m) => {
+      console.log("Connected to MongoDB successfully");
+      return m;
+    });
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (err) {
+    cached.promise = null;
+    console.error("Database connection error:", err.message);
+    throw new Error(`Database connection failed: ${err.message}. Please check your MONGO_URL in Vercel environment variables and Atlas IP whitelist.`);
+  }
+
+  return cached.conn;
+}
 
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
@@ -49,10 +59,18 @@ app.use(express.json());
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Ensure DB is connected before processing requests
+// Ensure database connection is active before processing any request
 app.use(async (req, res, next) => {
-  await connectDB();
-  next();
+  // Ignore static assets or favicon from blocking
+  if (req.path === "/favicon.ico" || req.path.startsWith("/css/")) {
+    return next();
+  }
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Redirect root to listings
@@ -235,7 +253,13 @@ app.all("*", (req, res) => {
 // Centralized error handling middleware
 app.use((err, req, res, next) => {
   console.error("Unhandled Error:", err);
-  res.status(500).send(`<h3>Something went wrong!</h3><p>${err.message}</p><a href='/listings'>Go back</a>`);
+  res.status(500).send(`
+    <div style="font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+      <h2 style="color: #ff385c;">Application Error</h2>
+      <p style="color: #333; font-size: 16px;">${err.message}</p>
+      <a href="/listings" style="display: inline-block; margin-top: 15px; padding: 8px 16px; background: #ff385c; color: white; text-decoration: none; border-radius: 4px;">Retry / Go back</a>
+    </div>
+  `);
 });
 
 const PORT = process.env.PORT || 8080;
