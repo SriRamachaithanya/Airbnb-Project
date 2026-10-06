@@ -1,6 +1,6 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row justify-content-center">
+<div class="row justify-content-center my-5">
   <div class="col-12 col-md-8 col-lg-7">
     <div class="form-card">
       <div class="d-flex align-items-center gap-2 mb-2">
@@ -9,7 +9,7 @@
       <h2 class="form-title">Create a new listing</h2>
       <p class="form-subtitle">Share your home with travelers from around the world.</p>
 
-      <form method="POST" action="/listings" class="needs-validation">
+      <form method="POST" action="/listings" enctype="multipart/form-data" class="needs-validation">
         <!-- Title -->
         <div class="mb-3">
           <label for="title" class="form-label">Property Title</label>
@@ -18,7 +18,7 @@
             id="title"
             name="listing[title]" 
             placeholder="e.g. Luxurious Beachfront Villa with Private Pool" 
-            class="form-control"
+            class="form-control rounded-3"
             required
           >
         </div>
@@ -30,30 +30,36 @@
             id="description"
             name="listing[description]" 
             placeholder="Describe what makes your space special, the view, atmosphere, and amenities..." 
-            class="form-control" 
+            class="form-control rounded-3" 
             rows="4"
             required
           ></textarea>
         </div>
 
-        <!-- Image URL -->
+        <!-- Image Upload or URL Input -->
         <div class="mb-3">
-          <label for="image" class="form-label">Cover Image URL</label>
+          <label for="image" class="form-label">Cover Photo (File Upload or Image URL)</label>
+          <input 
+            type="file" 
+            id="imageFile"
+            name="listing[image]" 
+            class="form-control rounded-3 mb-2"
+            accept="image/*"
+          >
           <input 
             type="url" 
-            id="image"
+            id="imageUrl"
             name="listing[image]" 
-            placeholder="https://images.unsplash.com/photo-..." 
-            class="form-control"
+            placeholder="Or paste an Unsplash / direct image URL" 
+            class="form-control rounded-3"
           >
-          <div class="form-text text-muted">Provide a high-resolution Unsplash or direct image URL.</div>
         </div>
 
         <!-- Category & Price Row -->
         <div class="row g-3 mb-3">
           <div class="col-md-6">
             <label for="category" class="form-label">Property Category</label>
-            <select id="category" name="listing[category]" class="form-select">
+            <select id="category" name="listing[category]" class="form-select rounded-3">
               <option value="Trending">Trending</option>
               <option value="Beachfront">Beachfront</option>
               <option value="Cabins">Cabins</option>
@@ -76,12 +82,28 @@
                 type="number" 
                 id="price"
                 name="listing[price]" 
-                placeholder="1200" 
-                class="form-control"
+                placeholder="1500" 
+                class="form-control rounded-end-3"
                 min="100"
                 required
               >
             </div>
+          </div>
+        </div>
+
+        <!-- Capacity Specs (Guests, Bedrooms, Bathrooms) -->
+        <div class="row g-3 mb-3">
+          <div class="col-4">
+            <label for="maxGuests" class="form-label">Max Guests</label>
+            <input type="number" id="maxGuests" name="listing[maxGuests]" value="4" min="1" class="form-control rounded-3">
+          </div>
+          <div class="col-4">
+            <label for="bedrooms" class="form-label">Bedrooms</label>
+            <input type="number" id="bedrooms" name="listing[bedrooms]" value="2" min="1" class="form-control rounded-3">
+          </div>
+          <div class="col-4">
+            <label for="bathrooms" class="form-label">Bathrooms</label>
+            <input type="number" id="bathrooms" name="listing[bathrooms]" value="1" min="1" class="form-control rounded-3">
           </div>
         </div>
 
@@ -94,7 +116,7 @@
               id="location"
               name="listing[location]" 
               placeholder="e.g. Goa, Aspen, Malibu" 
-              class="form-control"
+              class="form-control rounded-3"
               required
             >
           </div>
@@ -106,7 +128,7 @@
               id="country"
               name="listing[country]" 
               placeholder="e.g. India, United States" 
-              class="form-control"
+              class="form-control rounded-3"
               required
             >
           </div>
@@ -114,8 +136,8 @@
 
         <!-- Action Buttons -->
         <div class="d-flex align-items-center justify-content-between pt-3 border-top">
-          <a href="/listings" class="btn btn-airbnb-outline">Cancel</a>
-          <button type="submit" class="btn btn-airbnb px-4">Publish Listing</button>
+          <a href="/listings" class="btn btn-airbnb-outline rounded-pill">Cancel</a>
+          <button type="submit" class="btn btn-airbnb rounded-pill px-4">Publish Listing</button>
         </div>
       </form>
     </div>

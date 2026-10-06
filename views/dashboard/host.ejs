@@ -1,0 +1,167 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container my-5" style="max-width: 1140px;">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1 mb-1">Host Portal</span>
+      <h2 class="fw-bold mb-0">Host Management Dashboard</h2>
+    </div>
+    <a href="/listings/new" class="btn btn-airbnb rounded-pill px-4">
+      <i class="fa-solid fa-plus me-1"></i> Add New Listing
+    </a>
+  </div>
+
+  <!-- Metric Statistics Cards -->
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-5">
+    <div class="col">
+      <div class="card border rounded-4 shadow-sm p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="text-secondary small fw-bold">TOTAL LISTINGS</div>
+            <h3 class="fw-bold mb-0 text-dark"><%= stats.totalListings %></h3>
+          </div>
+          <div class="p-3 bg-danger-subtle text-danger rounded-circle">
+            <i class="fa-solid fa-house fs-5"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card border rounded-4 shadow-sm p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="text-secondary small fw-bold">ACTIVE BOOKINGS</div>
+            <h3 class="fw-bold mb-0 text-dark"><%= stats.activeBookings %></h3>
+          </div>
+          <div class="p-3 bg-success-subtle text-success rounded-circle">
+            <i class="fa-solid fa-calendar-check fs-5"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card border rounded-4 shadow-sm p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="text-secondary small fw-bold">TOTAL EARNINGS</div>
+            <h3 class="fw-bold mb-0 text-dark">&#8377;<%= Number(stats.totalRevenue).toLocaleString("en-IN") %></h3>
+          </div>
+          <div class="p-3 bg-primary-subtle text-primary rounded-circle">
+            <i class="fa-solid fa-indian-rupee-sign fs-5"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="card border rounded-4 shadow-sm p-3 bg-white">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="text-secondary small fw-bold">AVG RATING</div>
+            <h3 class="fw-bold mb-0 text-dark"><%= stats.avgRating || '4.88' %> ★</h3>
+          </div>
+          <div class="p-3 bg-warning-subtle text-warning rounded-circle">
+            <i class="fa-solid fa-star fs-5"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hosted Listings Table -->
+  <div class="card border rounded-4 shadow-sm p-4 bg-white mb-5">
+    <h4 class="fw-bold mb-3">My Properties</h4>
+    <% if (myListings && myListings.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr class="text-secondary small">
+              <th>PROPERTY</th>
+              <th>LOCATION</th>
+              <th>PRICE/NIGHT</th>
+              <th>CATEGORY</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for (let l of myListings) { %>
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <img 
+                      src="<%= (l.images && l.images[0]) ? l.images[0].url : 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=800&q=60' %>" 
+                      alt="<%= l.title %>" 
+                      style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover;"
+                    >
+                    <div>
+                      <a href="/listings/<%= l._id %>" class="fw-bold text-dark text-decoration-none"><%= l.title %></a>
+                      <div class="text-muted small"><%= l.bedrooms %> bed &middot; <%= l.maxGuests %> guests</div>
+                    </div>
+                  </div>
+                </td>
+                <td><%= l.location %>, <%= l.country %></td>
+                <td class="fw-bold">&#8377;<%= Number(l.price).toLocaleString("en-IN") %></td>
+                <td><span class="badge bg-light text-dark border rounded-pill"><%= l.category %></span></td>
+                <td>
+                  <div class="d-flex gap-2">
+                    <a href="/listings/<%= l._id %>/edit" class="btn btn-sm btn-outline-dark rounded-pill">Edit</a>
+                    <form method="POST" action="/listings/<%= l._id %>?_method=DELETE" onsubmit="return confirm('Delete this listing?');" class="m-0">
+                      <button class="btn btn-sm btn-outline-danger rounded-pill">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="text-center py-4 text-muted">
+        <p>You haven't listed any properties yet.</p>
+        <a href="/listings/new" class="btn btn-sm btn-airbnb rounded-pill px-3">Create your first listing</a>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Host Bookings Table -->
+  <div class="card border rounded-4 shadow-sm p-4 bg-white">
+    <h4 class="fw-bold mb-3">Recent Guest Reservations</h4>
+    <% if (bookings && bookings.length > 0) { %>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr class="text-secondary small">
+              <th>GUEST</th>
+              <th>PROPERTY</th>
+              <th>DATES</th>
+              <th>TOTAL REVENUE</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for (let b of bookings) { %>
+              <tr>
+                <td>
+                  <div class="fw-bold"><%= b.user ? b.user.name : 'Guest' %></div>
+                  <div class="text-muted small"><%= b.user ? b.user.email : '' %></div>
+                </td>
+                <td><%= b.listing ? b.listing.title : 'Listing' %></td>
+                <td><%= new Date(b.checkIn).toLocaleDateString() %> &ndash; <%= new Date(b.checkOut).toLocaleDateString() %> (<%= b.nights %>n)</td>
+                <td class="fw-bold text-success">&#8377;<%= Number(b.totalPrice).toLocaleString("en-IN") %></td>
+                <td>
+                  <span class="badge <%= b.status === 'confirmed' ? 'bg-success-subtle text-success' : (b.status === 'cancelled' ? 'bg-danger-subtle text-danger' : 'bg-secondary') %> rounded-pill px-2 py-1">
+                    <%= b.status.toUpperCase() %>
+                  </span>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="text-center py-4 text-muted">No reservations received yet.</div>
+    <% } %>
+  </div>
+</div>

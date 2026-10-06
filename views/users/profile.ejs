@@ -1,0 +1,78 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container my-5" style="max-width: 960px;">
+  <div class="row g-4">
+    <!-- Left Column: User Card -->
+    <div class="col-12 col-md-4">
+      <div class="card border rounded-4 shadow-sm p-4 text-center bg-white">
+        <div class="position-relative d-inline-block mx-auto mb-3">
+          <img 
+            src="<%= user.profileImage %>" 
+            alt="<%= user.name %>" 
+            class="rounded-circle shadow-sm border" 
+            style="width: 120px; height: 120px; object-fit: cover;"
+          >
+          <span class="position-absolute bottom-0 end-0 badge bg-danger rounded-pill p-2">
+            <i class="fa-solid fa-camera"></i>
+          </span>
+        </div>
+
+        <h4 class="fw-bold mb-1"><%= user.name %></h4>
+        <p class="text-secondary small mb-2"><%= user.email %></p>
+        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-1 text-uppercase fw-bold mb-3">
+          <%= user.role %>
+        </span>
+
+        <hr class="my-3">
+
+        <div class="d-flex justify-content-around text-start">
+          <div>
+            <div class="fw-bold fs-5"><%= bookingsCount %></div>
+            <div class="text-secondary small">Trips Booked</div>
+          </div>
+          <% if (user.role === 'host' || user.role === 'admin') { %>
+            <div>
+              <div class="fw-bold fs-5"><%= hostedListingsCount %></div>
+              <div class="text-secondary small">Listings Hosted</div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Edit Profile Form -->
+    <div class="col-12 col-md-8">
+      <div class="card border rounded-4 shadow-sm p-4 p-md-5 bg-white">
+        <h4 class="fw-bold mb-3">Profile Details</h4>
+        <p class="text-secondary small mb-4">Manage your personal information and contact details.</p>
+
+        <form method="POST" action="/profile?_method=PUT">
+          <div class="mb-3">
+            <label for="name" class="form-label fw-semibold">Display Name</label>
+            <input type="text" id="name" name="name" value="<%= user.name %>" class="form-control rounded-3" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label fw-semibold">Email Address</label>
+            <input type="email" id="email" value="<%= user.email %>" class="form-control rounded-3 bg-light" disabled>
+            <div class="form-text small">Email address cannot be changed directly.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="phone" class="form-label fw-semibold">Phone Number</label>
+            <input type="tel" id="phone" name="phone" value="<%= user.phone %>" placeholder="+91 98765 43210" class="form-control rounded-3">
+          </div>
+
+          <div class="mb-4">
+            <label for="profileImage" class="form-label fw-semibold">Profile Photo URL</label>
+            <input type="url" id="profileImage" name="profileImage" value="<%= user.profileImage %>" class="form-control rounded-3">
+          </div>
+
+          <button type="submit" class="btn btn-airbnb px-4 py-2 rounded-3 fw-semibold">
+            Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

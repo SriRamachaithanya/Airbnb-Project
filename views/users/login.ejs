@@ -1,0 +1,52 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="row justify-content-center my-5">
+  <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+    <div class="card border rounded-4 shadow-sm p-4 p-md-5 bg-white">
+      <div class="text-center mb-4">
+        <div class="d-inline-flex p-3 rounded-circle bg-danger-subtle text-danger mb-2">
+          <i class="fa-solid fa-lock fs-4"></i>
+        </div>
+        <h3 class="fw-bold">Welcome back</h3>
+        <p class="text-secondary small">Log in to manage your stays, wishlist, and bookings.</p>
+      </div>
+
+      <form method="POST" action="/login" class="needs-validation">
+        <div class="mb-3">
+          <label for="email" class="form-label fw-semibold">Email address</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            class="form-control rounded-3 py-2" 
+            placeholder="you@example.com" 
+            required 
+            autofocus
+          >
+        </div>
+
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label for="password" class="form-label fw-semibold mb-0">Password</label>
+          </div>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            class="form-control rounded-3 py-2" 
+            placeholder="Enter your password" 
+            required
+          >
+        </div>
+
+        <button type="submit" class="btn btn-airbnb w-100 py-2 fs-6 rounded-3 fw-bold mb-3">
+          Log in
+        </button>
+
+        <div class="text-center text-secondary small">
+          Don't have an account? <a href="/register" class="text-danger fw-bold text-decoration-underline">Sign up</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

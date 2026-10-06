@@ -1,6 +1,6 @@
 <% layout("/layouts/boilerplate") %>
 
-<!-- Airbnb Category Filter Carousel -->
+<!-- Category Carousel & Filter Bar -->
 <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-2">
   <div class="categories-container flex-grow-1">
     <a href="/listings" class="category-item <%= (!activeCategory || activeCategory === 'All') ? 'active' : '' %>">
@@ -49,12 +49,52 @@
     </a>
   </div>
 
-  <!-- Display Taxes Toggle Switch -->
-  <div class="tax-toggle-box d-none d-lg-flex">
-    <div class="form-check form-switch p-0 m-0 d-flex align-items-center gap-2">
-      <label class="form-check-label" for="taxToggleSwitch">Display total before taxes</label>
-      <input class="form-check-input ms-2" type="checkbox" role="switch" id="taxToggleSwitch" style="cursor: pointer;">
+  <!-- Filter Buttons & Tax Switch -->
+  <div class="d-flex align-items-center gap-2">
+    <!-- Advanced Filters Button -->
+    <button class="btn btn-outline-dark rounded-pill btn-sm d-flex align-items-center gap-2 px-3 py-2 fw-semibold" data-bs-toggle="collapse" data-bs-target="#advancedFiltersCollapse">
+      <i class="fa-solid fa-sliders"></i>
+      <span>Filters</span>
+    </button>
+
+    <!-- Taxes Toggle -->
+    <div class="tax-toggle-box d-none d-lg-flex my-0 py-2">
+      <div class="form-check form-switch p-0 m-0 d-flex align-items-center gap-2">
+        <label class="form-check-label small fw-semibold" for="taxToggleSwitch">Display taxes</label>
+        <input class="form-check-input ms-2" type="checkbox" role="switch" id="taxToggleSwitch" style="cursor: pointer;">
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- Advanced Search Collapse Form -->
+<div class="collapse my-3 <%= (minPrice || maxPrice || guests) ? 'show' : '' %>" id="advancedFiltersCollapse">
+  <div class="card card-body border rounded-4 shadow-sm bg-white p-4">
+    <form action="/listings" method="GET" class="row g-3 align-items-end">
+      <% if (activeCategory && activeCategory !== 'All') { %>
+        <input type="hidden" name="category" value="<%= activeCategory %>">
+      <% } %>
+      <div class="col-md-3">
+        <label class="form-label small fw-bold">Destination / Keyword</label>
+        <input type="text" name="search" value="<%= searchQuery %>" class="form-control rounded-pill" placeholder="e.g. Goa, Aspen, Villa">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small fw-bold">Min Price (₹)</label>
+        <input type="number" name="minPrice" value="<%= minPrice %>" class="form-control rounded-pill" placeholder="500">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small fw-bold">Max Price (₹)</label>
+        <input type="number" name="maxPrice" value="<%= maxPrice %>" class="form-control rounded-pill" placeholder="10000">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small fw-bold">Guests</label>
+        <input type="number" name="guests" value="<%= guests %>" class="form-control rounded-pill" placeholder="2" min="1">
+      </div>
+      <div class="col-md-3 d-flex gap-2">
+        <button type="submit" class="btn btn-airbnb rounded-pill flex-grow-1">Apply Filters</button>
+        <a href="/listings" class="btn btn-outline-secondary rounded-pill">Reset</a>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -63,19 +103,25 @@
   <% if (allListings && allListings.length > 0) { %>
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
       <% for (let listing of allListings) { %>
+        <% const isSavedInWishlist = savedListingIds && savedListingIds.includes(listing._id.toString()); %>
         <div class="col">
           <div class="listing-card">
             <div class="img-wrapper">
               <a href="/listings/<%= listing._id %>">
                 <img 
-                  src="<%= (listing.image && listing.image.url) ? listing.image.url : 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=800&q=60' %>" 
+                  src="<%= (listing.images && listing.images[0]) ? listing.images[0].url : 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=800&q=60' %>" 
                   alt="<%= listing.title %>"
                   loading="lazy"
                 />
               </a>
-              <!-- Wishlist Heart Button -->
-              <button class="wishlist-btn" title="Save to wishlist" aria-label="Save to wishlist">
-                <i class="fa-regular fa-heart"></i>
+              <!-- Wishlist Heart Toggle Button -->
+              <button 
+                class="wishlist-btn wishlist-toggle-btn <%= isSavedInWishlist ? 'active' : '' %>" 
+                data-listing-id="<%= listing._id %>"
+                title="Save to wishlist" 
+                aria-label="Save to wishlist"
+              >
+                <i class="<%= isSavedInWishlist ? 'fa-solid' : 'fa-regular' %> fa-heart"></i>
               </button>
             </div>
 
@@ -86,13 +132,13 @@
                     <%= listing.location %>, <%= listing.country %>
                   </h6>
                   <span class="listing-rating">
-                    <i class="fa-solid fa-star"></i>
-                    <span><%= listing.rating || '4.88' %></span>
+                    <i class="fa-solid fa-star text-warning"></i>
+                    <span><%= listing.avgRating > 0 ? listing.avgRating : '4.88' %></span>
                   </span>
                 </div>
                 
                 <p class="listing-subtext"><%= listing.title %></p>
-                <p class="listing-subtext text-muted" style="font-size: 0.8rem;">Added recently</p>
+                <p class="listing-subtext text-muted" style="font-size: 0.8rem;"><%= listing.bedrooms || 2 %> beds &middot; <%= listing.maxGuests || 4 %> guests</p>
                 
                 <div class="listing-pricing">
                   <span class="price-bold">&#8377;<%= Number(listing.price).toLocaleString("en-IN") %></span>
@@ -105,12 +151,34 @@
         </div>
       <% } %>
     </div>
+
+    <!-- Server-Side Pagination Bar -->
+    <% if (totalPages > 1) { %>
+      <nav aria-label="Page navigation" class="mt-5 mb-4">
+        <ul class="pagination justify-content-center">
+          <li class="page-item <%= currentPage <= 1 ? 'disabled' : '' %>">
+            <a class="page-link rounded-pill me-1" href="/listings?page=<%= currentPage - 1 %><%= activeCategory ? '&category=' + activeCategory : '' %><%= searchQuery ? '&search=' + searchQuery : '' %>">Previous</a>
+          </li>
+          
+          <% for (let i = 1; i <= totalPages; i++) { %>
+            <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+              <a class="page-link rounded-circle mx-1" href="/listings?page=<%= i %><%= activeCategory ? '&category=' + activeCategory : '' %><%= searchQuery ? '&search=' + searchQuery : '' %>"><%= i %></a>
+            </li>
+          <% } %>
+
+          <li class="page-item <%= currentPage >= totalPages ? 'disabled' : '' %>">
+            <a class="page-link rounded-pill ms-1" href="/listings?page=<%= currentPage + 1 %><%= activeCategory ? '&category=' + activeCategory : '' %><%= searchQuery ? '&search=' + searchQuery : '' %>">Next</a>
+          </li>
+        </ul>
+      </nav>
+    <% } %>
+
   <% } else { %>
-    <div class="text-center py-5 my-5">
+    <div class="text-center py-5 my-5 border rounded-4 p-5 bg-white">
       <i class="fa-solid fa-magnifying-glass mb-3 text-muted" style="font-size: 3rem;"></i>
       <h4 class="fw-bold">No exact matches found</h4>
-      <p class="text-muted">Try changing or clearing your search filter to see more listings.</p>
-      <a href="/listings" class="btn btn-airbnb mt-2">Clear all filters</a>
+      <p class="text-muted">Try clearing your price, guests, or category filters to discover more properties.</p>
+      <a href="/listings" class="btn btn-airbnb rounded-pill px-4 mt-2">Clear all filters</a>
     </div>
   <% } %>
 </div>

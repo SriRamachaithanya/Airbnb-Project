@@ -29,28 +29,59 @@
 
     <!-- Right User Navigation Menu -->
     <div class="airbnb-user-nav">
+      <!-- AI Assistant Button -->
+      <button class="btn btn-outline-danger btn-sm rounded-pill d-flex align-items-center gap-1 px-3 py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#aiAssistantModal">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span class="d-none d-lg-inline">AI Assistant</span>
+      </button>
+
       <a href="/listings/new" class="host-link-btn d-none d-sm-block">
         Airbnb your home
       </a>
-
-      <button class="globe-btn d-none d-sm-block" title="Language & Currency">
-        <i class="fa-solid fa-globe"></i>
-      </button>
 
       <!-- Dropdown User Pill -->
       <div class="dropdown">
         <div class="user-profile-pill" data-bs-toggle="dropdown" aria-expanded="false" role="button">
           <i class="fa-solid fa-bars text-secondary" style="font-size: 0.9rem;"></i>
-          <div class="user-avatar-placeholder">
-            <i class="fa-solid fa-user"></i>
-          </div>
+          <% if (currentUser && currentUser.profileImage) { %>
+            <img src="<%= currentUser.profileImage %>" alt="<%= currentUser.name %>" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+          <% } else { %>
+            <div class="user-avatar-placeholder">
+              <i class="fa-solid fa-user"></i>
+            </div>
+          <% } %>
         </div>
         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 mt-2 py-2" style="min-width: 220px;">
-          <li><a class="dropdown-item fw-semibold py-2" href="/listings">Explore Listings</a></li>
-          <li><a class="dropdown-item fw-semibold py-2" href="/listings/new">Airbnb your home</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item text-secondary py-2" href="/terms">Help Center</a></li>
-          <li><a class="dropdown-item text-secondary py-2" href="/privacy">Privacy & Terms</a></li>
+          <% if (!currentUser) { %>
+            <li><a class="dropdown-item fw-bold py-2" href="/login">Log in</a></li>
+            <li><a class="dropdown-item py-2" href="/register">Sign up</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item py-2" href="/listings/new">Airbnb your home</a></li>
+            <li><a class="dropdown-item text-secondary py-2" href="/terms">Help Center</a></li>
+          <% } else { %>
+            <li>
+              <div class="dropdown-item-text py-1">
+                <span class="fw-bold d-block text-truncate"><%= currentUser.name %></span>
+                <span class="badge bg-danger-subtle text-danger rounded-pill"><%= currentUser.role.toUpperCase() %></span>
+              </div>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item py-2 fw-semibold" href="/my-trips"><i class="fa-solid fa-suitcase me-2 text-secondary"></i>My Trips</a></li>
+            <li><a class="dropdown-item py-2 fw-semibold" href="/my-wishlist"><i class="fa-regular fa-heart me-2 text-danger"></i>Wishlist</a></li>
+            <li><a class="dropdown-item py-2" href="/profile"><i class="fa-solid fa-user-gear me-2 text-secondary"></i>Account Profile</a></li>
+            
+            <% if (currentUser.role === 'host' || currentUser.role === 'admin') { %>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item py-2 fw-semibold text-danger" href="/host/dashboard"><i class="fa-solid fa-chart-line me-2"></i>Host Dashboard</a></li>
+            <% } %>
+
+            <% if (currentUser.role === 'admin') { %>
+              <li><a class="dropdown-item py-2 fw-semibold text-primary" href="/admin"><i class="fa-solid fa-shield-halved me-2"></i>Admin Panel</a></li>
+            <% } %>
+
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item py-2 text-danger fw-semibold" href="/logout"><i class="fa-solid fa-right-from-bracket me-2"></i>Log out</a></li>
+          <% } %>
         </ul>
       </div>
     </div>

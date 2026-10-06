@@ -1,0 +1,117 @@
+<!-- AI Travel Assistant Modal -->
+<div class="modal fade" id="aiAssistantModal" tabindex="-1" aria-labelledby="aiAssistantModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <div class="d-flex align-items-center gap-2">
+          <div class="p-2 rounded-circle bg-danger-subtle text-danger">
+            <i class="fa-solid fa-wand-magic-sparkles fs-5"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold" id="aiAssistantModalLabel">Wanderlust AI Travel Assistant</h5>
+            <p class="text-secondary small mb-0">Ask for customized itineraries and stays matched from real inventory.</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body p-4">
+        <form id="aiPromptForm" onsubmit="handleAiSubmit(event)">
+          <div class="input-group mb-3 shadow-sm rounded-pill overflow-hidden border p-1 bg-white">
+            <input 
+              type="text" 
+              id="aiQueryInput" 
+              class="form-control border-0 shadow-none ps-3" 
+              placeholder="e.g. 3-day romantic trip to Goa under ₹15,000 for 2 guests"
+              required
+            >
+            <button class="btn btn-airbnb rounded-pill px-4" type="submit" id="aiSubmitBtn">
+              <i class="fa-solid fa-paper-plane me-1"></i> Plan
+            </button>
+          </div>
+        </form>
+
+        <!-- Loading state -->
+        <div id="aiLoading" class="text-center py-4 d-none">
+          <div class="spinner-border text-danger mb-2" role="status"></div>
+          <p class="text-secondary fw-semibold">Finding the best properties and crafting your itinerary...</p>
+        </div>
+
+        <!-- AI Output Results -->
+        <div id="aiResults" class="d-none mt-3">
+          <div class="alert alert-light border rounded-3 p-3 mb-3">
+            <h6 class="fw-bold text-dark mb-1" id="aiDestinationHeading">Destination Plan</h6>
+            <p class="text-secondary small mb-0" id="aiSummaryText"></p>
+          </div>
+
+          <h6 class="fw-bold mb-3"><i class="fa-solid fa-hotel text-danger me-1"></i> Recommended Stays</h6>
+          <div class="row g-3" id="aiStaysContainer"></div>
+
+          <h6 class="fw-bold mt-4 mb-2"><i class="fa-solid fa-compass text-danger me-1"></i> Suggested Activities</h6>
+          <ul class="list-group list-group-flush border rounded-3 p-2 small mb-2" id="aiActivitiesContainer"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function handleAiSubmit(e) {
+    e.preventDefault();
+    const prompt = document.getElementById("aiQueryInput").value;
+    const loading = document.getElementById("aiLoading");
+    const results = document.getElementById("aiResults");
+    const submitBtn = document.getElementById("aiSubmitBtn");
+
+    loading.classList.remove("d-none");
+    results.classList.add("d-none");
+    submitBtn.disabled = true;
+
+    try {
+      const res = await fetch("/api/ai/travel-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message || "Failed to generate plan");
+
+      const data = json.data;
+      document.getElementById("aiDestinationHeading").innerText = `Trip to ${data.destination}`;
+      document.getElementById("aiSummaryText").innerText = data.summary;
+
+      // Render stays
+      const staysContainer = document.getElementById("aiStaysContainer");
+      staysContainer.innerHTML = data.recommendedStays.map(stay => `
+        <div class="col-md-6">
+          <div class="card h-100 border shadow-sm rounded-3 overflow-hidden">
+            <img src="${stay.imageUrl}" style="height: 120px; object-fit: cover;" alt="${stay.title}">
+            <div class="p-2">
+              <h6 class="fw-bold mb-1 text-truncate">${stay.title}</h6>
+              <p class="text-muted small mb-1">${stay.location}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-danger">₹${stay.pricePerNight.toLocaleString('en-IN')}/night</span>
+                <a href="/listings/${stay.id}" class="btn btn-sm btn-outline-dark rounded-pill">View</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+      // Render activities
+      const actContainer = document.getElementById("aiActivitiesContainer");
+      actContainer.innerHTML = data.suggestedActivities.map(act => `
+        <li class="list-group-item bg-transparent border-0 py-1"><i class="fa-solid fa-check text-success me-2"></i>${act}</li>
+      `).join("");
+
+      loading.classList.add("d-none");
+      results.classList.remove("d-none");
+    } catch (err) {
+      alert("Error: " + err.message);
+      loading.classList.add("d-none");
+    } finally {
+      submitBtn.disabled = false;
+    }
+  }
+</script>

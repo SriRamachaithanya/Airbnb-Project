@@ -1,0 +1,98 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container my-5" style="max-width: 1140px;">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-1">Superuser</span>
+      <h2 class="fw-bold mb-0">Platform Administration Panel</h2>
+    </div>
+  </div>
+
+  <!-- Platform Overview Stats -->
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-5">
+    <div class="col">
+      <div class="card border rounded-4 shadow-sm p-3 bg-white">
+        <div class="text-secondary small fw-bold">TOTAL REGISTERED USERS</div>
+        <h3 class="fw-bold mb-0 text-dark"><%= stats.totalUsers %></h3>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card border rounded-4 shadow-sm p-3 bg-white">
+        <div class="text-secondary small fw-bold">TOTAL HOSTS</div>
+        <h3 class="fw-bold mb-0 text-dark"><%= stats.totalHosts %></h3>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card border rounded-4 shadow-sm p-3 bg-white">
+        <div class="text-secondary small fw-bold">TOTAL LISTINGS</div>
+        <h3 class="fw-bold mb-0 text-dark"><%= stats.totalListings %></h3>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card border rounded-4 shadow-sm p-3 bg-white">
+        <div class="text-secondary small fw-bold">PLATFORM GMV (REVENUE)</div>
+        <h3 class="fw-bold mb-0 text-success">&#8377;<%= Number(stats.totalRevenue).toLocaleString("en-IN") %></h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Listings Moderation -->
+  <div class="card border rounded-4 shadow-sm p-4 bg-white mb-5">
+    <h4 class="fw-bold mb-3">All Active Properties (Moderation)</h4>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr class="text-secondary small">
+            <th>TITLE</th>
+            <th>LOCATION</th>
+            <th>PRICE</th>
+            <th>OWNER</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let l of latestListings) { %>
+            <tr>
+              <td class="fw-bold"><a href="/listings/<%= l._id %>" class="text-dark"><%= l.title %></a></td>
+              <td><%= l.location %>, <%= l.country %></td>
+              <td>&#8377;<%= Number(l.price).toLocaleString("en-IN") %></td>
+              <td><%= l.owner ? l.owner.name : 'System Host' %></td>
+              <td>
+                <form method="POST" action="/listings/<%= l._id %>?_method=DELETE" onsubmit="return confirm('Admin: Force delete this listing?');" class="m-0">
+                  <button class="btn btn-sm btn-outline-danger rounded-pill">Remove</button>
+                </form>
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Users Directory -->
+  <div class="card border rounded-4 shadow-sm p-4 bg-white">
+    <h4 class="fw-bold mb-3">Recent Platform Users</h4>
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr class="text-secondary small">
+            <th>NAME</th>
+            <th>EMAIL</th>
+            <th>ROLE</th>
+            <th>JOINED</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% for (let u of latestUsers) { %>
+            <tr>
+              <td class="fw-bold"><%= u.name %></td>
+              <td><%= u.email %></td>
+              <td><span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-1"><%= u.role.toUpperCase() %></span></td>
+              <td class="text-muted small"><%= new Date(u.createdAt).toLocaleDateString() %></td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

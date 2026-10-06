@@ -1,0 +1,84 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container my-5" style="max-width: 1080px;">
+  <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1">My Trips & Reservations</h2>
+      <p class="text-secondary small mb-0">View and manage all your upcoming, past, and cancelled stays.</p>
+    </div>
+    <a href="/listings" class="btn btn-outline-dark rounded-pill px-4">
+      <i class="fa-solid fa-magnifying-glass me-1"></i> Explore More Stays
+    </a>
+  </div>
+
+  <!-- Upcoming Trips Section -->
+  <h4 class="fw-bold mb-3 mt-4"><i class="fa-solid fa-plane-departure text-danger me-2"></i>Upcoming Trips</h4>
+  <% if (upcomingBookings && upcomingBookings.length > 0) { %>
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-5">
+      <% for (let b of upcomingBookings) { %>
+        <div class="col">
+          <div class="card h-100 border rounded-4 shadow-sm overflow-hidden bg-white">
+            <div class="row g-0 h-100">
+              <div class="col-5">
+                <img 
+                  src="<%= (b.listing && b.listing.images && b.listing.images[0]) ? b.listing.images[0].url : 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=800&q=60' %>" 
+                  alt="<%= b.listing ? b.listing.title : 'Listing' %>" 
+                  class="img-fluid h-100 w-100" 
+                  style="object-fit: cover;"
+                >
+              </div>
+              <div class="col-7 d-flex flex-direction-column">
+                <div class="card-body p-3 d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1"><%= b.status.toUpperCase() %></span>
+                      <span class="text-secondary small"><%= b.nights %> nights</span>
+                    </div>
+                    <h6 class="fw-bold text-truncate mb-1"><%= b.listing ? b.listing.title : 'Stay' %></h6>
+                    <p class="text-secondary small mb-2"><%= b.listing ? b.listing.location : '' %>, <%= b.listing ? b.listing.country : '' %></p>
+                    <div class="bg-light p-2 rounded-3 small mb-2">
+                      <div class="fw-semibold text-dark"><%= new Date(b.checkIn).toLocaleDateString() %> &ndash; <%= new Date(b.checkOut).toLocaleDateString() %></div>
+                      <div class="text-secondary"><%= b.guests %> <%= b.guests > 1 ? 'guests' : 'guest' %> &middot; Total: &#8377;<%= Number(b.totalPrice).toLocaleString("en-IN") %></div>
+                    </div>
+                  </div>
+                  <div class="d-flex gap-2 mt-2">
+                    <a href="/bookings/<%= b._id %>" class="btn btn-sm btn-dark flex-grow-1 rounded-pill">Receipt</a>
+                    <form method="POST" action="/bookings/<%= b._id %>/cancel" onsubmit="return confirm('Are you sure you want to cancel this reservation?');">
+                      <button class="btn btn-sm btn-outline-danger rounded-pill">Cancel</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  <% } else { %>
+    <div class="alert alert-light border rounded-4 p-4 text-center mb-5">
+      <i class="fa-solid fa-suitcase-rolling text-secondary fs-2 mb-2"></i>
+      <h6 class="fw-bold">No upcoming trips booked yet</h6>
+      <p class="text-secondary small mb-3">Time to dust off your bags and start planning your next getaway.</p>
+      <a href="/listings" class="btn btn-airbnb rounded-pill px-4">Start Searching</a>
+    </div>
+  <% } %>
+
+  <!-- Past Trips Section -->
+  <% if (pastBookings && pastBookings.length > 0) { %>
+    <h4 class="fw-bold mb-3 mt-4 text-secondary"><i class="fa-solid fa-clock-rotate-left me-2"></i>Past Trips</h4>
+    <div class="row row-cols-1 row-cols-md-3 g-3 mb-5">
+      <% for (let b of pastBookings) { %>
+        <div class="col">
+          <div class="card h-100 border rounded-4 shadow-sm p-3 bg-white">
+            <h6 class="fw-bold mb-1 text-truncate"><%= b.listing ? b.listing.title : 'Stay' %></h6>
+            <p class="text-secondary small mb-2"><%= new Date(b.checkIn).toLocaleDateString() %> &ndash; <%= new Date(b.checkOut).toLocaleDateString() %></p>
+            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+              <span class="fw-bold">&#8377;<%= Number(b.totalPrice).toLocaleString("en-IN") %></span>
+              <a href="/bookings/<%= b._id %>" class="btn btn-sm btn-outline-dark rounded-pill">View Details</a>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  <% } %>
+</div>
