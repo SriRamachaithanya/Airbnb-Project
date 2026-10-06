@@ -10,7 +10,12 @@ const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 
-const MONGO_URL = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/wanderlust1";
+const MONGO_URL =
+  process.env.MONGO_URL ||
+  process.env.MONGODB_URI ||
+  process.env.ATLASDB_URL ||
+  process.env.DATABASE_URL ||
+  "mongodb://127.0.0.1:27017/wanderlust1";
 
 // Database Connection with caching for Serverless / Vercel
 let isConnected = false;
@@ -19,12 +24,17 @@ async function connectDB() {
     isConnected = true;
     return;
   }
+  if (!process.env.MONGO_URL && !process.env.MONGODB_URI && !process.env.ATLASDB_URL && process.env.NODE_ENV === "production") {
+    console.error("CRITICAL: No MongoDB Atlas connection URI provided in Vercel Environment Variables!");
+  }
   try {
-    await mongoose.connect(MONGO_URL);
+    await mongoose.connect(MONGO_URL, {
+      serverSelectionTimeoutMS: 5000,
+    });
     isConnected = true;
     console.log("Connected to MongoDB successfully");
   } catch (err) {
-    console.error("MongoDB connection error:", err);
+    console.error("MongoDB connection error:", err.message);
   }
 }
 
